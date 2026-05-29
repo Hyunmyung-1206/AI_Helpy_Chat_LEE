@@ -7,6 +7,7 @@ from .tool_page import ToolPage
 
 
 class QuizPage(ToolPage):
+    QUIZ_TOOL_ID = "98b00265-c2fb-43cc-8785-5330e18f8c28"
     QUIZ_GENERATE_MENU = (
         By.CSS_SELECTOR,
         "a[href='/ai-helpy-chat/tools/98b00265-c2fb-43cc-8785-5330e18f8c28']",
@@ -30,7 +31,10 @@ class QuizPage(ToolPage):
     )
     DROPDOWN_LIST = (By.CSS_SELECTOR, "ul[role='listbox']")
 
-    TOPIC_INPUT = (By.CSS_SELECTOR, "textarea[name='content']")
+    TOPIC_INPUT = (
+        By.CSS_SELECTOR,
+        "textarea[name='content']:not([aria-hidden='true'])",
+    )
 
     QUIZ_SUBMIT_BUTTON = (
         By.CSS_SELECTOR,
@@ -50,7 +54,7 @@ class QuizPage(ToolPage):
 
     ERROR_MESSAGE = (
         By.CSS_SELECTOR,
-        ".MuiFormHelperText-root.Mui-error",
+        "[id$='-helper-text'].MuiFormHelperText-root.Mui-error",
     )
     OUTPUT_PANEL = (
         By.CSS_SELECTOR,
@@ -71,38 +75,24 @@ class QuizPage(ToolPage):
     )
 
     def navigate_to_quiz_page(self):
-        self.setup_tool_tab()
-        self.click(self.QUIZ_GENERATE_MENU)
+        origin = self.driver.execute_script("return window.location.origin;")
+        self.driver.get(f"{origin}/ai-helpy-chat/tools/{self.QUIZ_TOOL_ID}")
         self.wait.until(
-            lambda driver: "98b00265-c2fb-43cc-8785-5330e18f8c28"
-            in driver.current_url
+            lambda driver: self.QUIZ_TOOL_ID in driver.current_url
         )
+        self.wait_for_visible(self.TOPIC_INPUT)
 
     def verify_quiz_page_url(self):
         current_url = self.driver.current_url
-        assert "98b00265-c2fb-43cc-8785-5330e18f8c28" in current_url, (
+        assert self.QUIZ_TOOL_ID in current_url, (
             f"퀴즈 생성 페이지 URL이 아닙니다. actual={current_url}"
         )
 
     def click_quiz_type_dropdown(self):
-        dropdown = self.wait.until(
-            EC.element_to_be_clickable(self.QUIZ_TYPE_DROPDOWN)
-        )
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block:'center'});",
-            dropdown,
-        )
-        dropdown.click()
+        self.click(self.QUIZ_TYPE_DROPDOWN)
 
     def click_quiz_difficulty_dropdown(self):
-        dropdown = self.wait.until(
-            EC.element_to_be_clickable(self.QUIZ_DIFFICULTY_DROPDOWN)
-        )
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block:'center'});",
-            dropdown,
-        )
-        dropdown.click()
+        self.click(self.QUIZ_DIFFICULTY_DROPDOWN)
 
     def is_dropdown_displayed(self) -> bool:
         dropdown = self.wait.until(EC.visibility_of_element_located(self.DROPDOWN_LIST))
@@ -127,23 +117,10 @@ class QuizPage(ToolPage):
         return option.is_displayed()
 
     def select_dropdown_option_only(self, option_value: str):
-        option = self.wait.until(
-            EC.element_to_be_clickable(self._dropdown_option(option_value))
-        )
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block:'center'});",
-            option,
-        )
-        option.click()
+        self.click(self._dropdown_option(option_value))
 
     def select_mui_dropdown(self, dropdown_locator: tuple, option_value: str):
-        dropdown = self.wait.until(EC.element_to_be_clickable(dropdown_locator))
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block:'center'});",
-            dropdown,
-        )
-        dropdown.click()
-
+        self.click(dropdown_locator)
         self.select_dropdown_option_only(option_value)
         self.wait_until_invisible(self.DROPDOWN_LIST)
 
@@ -154,15 +131,21 @@ class QuizPage(ToolPage):
         )
 
     def enter_topic(self, topic: str):
-        element = self.wait.until(EC.visibility_of_element_located(self.TOPIC_INPUT))
-        element.send_keys(topic)
+        self.enter_text(self.TOPIC_INPUT, topic)
 
     def clear_topic_input(self):
         element = self.wait.until(EC.visibility_of_element_located(self.TOPIC_INPUT))
+        self.driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});",
+            element,
+        )
         element.click()
         element.send_keys(Keys.CONTROL, "a")
         element.send_keys(Keys.DELETE)
-        self.wait.until(lambda driver: (element.get_attribute("value") or "") == "")
+
+        self.wait.until(
+            lambda driver: (driver.find_element(*self.TOPIC_INPUT).get_attribute("value") or "") == ""
+        )
 
     def blur_active_element(self):
         self.driver.execute_script("document.activeElement && document.activeElement.blur();")
