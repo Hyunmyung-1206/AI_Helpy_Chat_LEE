@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+.DS_Store
+venv/
+
+# Claude Code
+.claude/
+local_changes.patch
+docs/
+counter.txt
