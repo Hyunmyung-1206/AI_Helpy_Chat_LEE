@@ -1,84 +1,129 @@
 # HelpyChat QA Automation
 
-HelpyChat 서비스의 주요 사용자 흐름을 검증하는 Python 기반 E2E UI 자동화 프로젝트입니다.
-Selenium WebDriver와 Pytest를 사용하며, 화면 조작 로직은 Page Object Model(POM) 구조로 분리되어 있습니다.
+> AI Helpy Chat의 핵심 사용자 흐름을 검증하고, 실패 증거를 남기도록 설계한 E2E QA 자동화 프로젝트입니다.
 
-## 기술 스택
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-9.0.3-0A9EDC?logo=pytest&logoColor=white)
+![Selenium](https://img.shields.io/badge/Selenium-4.44.0-43B02A?logo=selenium&logoColor=white)
+![GitLab CI](https://img.shields.io/badge/GitLab-CI/CD-FC6D26?logo=gitlab&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-compatible-2088FF?logo=githubactions&logoColor=white)
+![Allure](https://img.shields.io/badge/Allure-Report-FF5A5F)
+![Ruff](https://img.shields.io/badge/Ruff-Lint-261230)
 
-- Python 3.10 이상
-- Pytest
-- Selenium WebDriver
-- python-dotenv
-- requests
-- Slack Incoming Webhook
-- Jira REST API
-- GitLab CI/CD
+## Why This Project
 
-## 프로젝트 구조
+이 프로젝트는 단순히 테스트 코드를 많이 작성하는 것이 목표가 아니었습니다. AI Helpy Chat처럼 비동기 응답과 동적 UI가 많은 서비스에서, 실제 사용자가 겪는 흐름을 자동화하고 실패 원인을 추적 가능한 형태로 남기는 것이 목표였습니다.
+
+진행 중에는 MUI 컴포넌트의 클릭 방해, React rerender로 인한 StaleElement, 파일 업로드/다운로드 검증 한계, Windows Runner의 한글 인코딩 문제처럼 UI 자동화에서 자주 발생하는 불안정성을 마주했습니다.
+
+클릭과 입력이 흔들리는 문제는 화면별 조작 로직을 Page Object로 나누고, 반복되는 클릭·입력·대기 처리를 BasePage의 공통 메서드로 정리해 대응했습니다. 다국어 환경에서도 테스트가 쉽게 깨지지 않도록, 화면 문구만 바라보는 locator를 줄이고 role, name, form, URL, data-testid 같은 구조 기반 locator를 우선 검토했습니다. 파일 업로드/다운로드처럼 자동화가 불안정한 영역은 검증 가능한 범위와 수동 확인이 필요한 범위를 분리했고, Windows Runner의 한글 로그 문제는 CI 인코딩 설정으로 보완했습니다. 실패 시에는 로그·스크린샷·Slack/Jira 알림이 남도록 구성했으며, 실제 서비스 결함은 skip하지 않고 xfail로 관리해 알려진 버그와 새로운 회귀를 구분할 수 있게 했습니다.
+
+이 과정을 통해 테스트 자동화는 단순 반복 작업을 줄이는 도구가 아니라, 품질 리스크를 설명 가능한 증거로 바꾸는 작업이라는 점을 배웠습니다.
+
+---
+
+## Project Snapshot
+
+| 구분 | 값 | 기준 |
+|---|---:|---|
+| 테스트 케이스 | 198건 | 최종 결과 보고서 |
+| Pass | 180건 | 최종 결과 보고서 |
+| 실행 Pass rate | 95.24% | 최종 결과 보고서 |
+| 자동화 시나리오 | 43개 | 최종 결과 보고서 |
+| 테스트 모듈 | 18개 | 현재 저장소 |
+| 테스트 함수 | 73개 | 현재 저장소 |
+| Page Object | 17개 | 현재 저장소 |
+| 지원 브라우저 | Chrome, Edge, Firefox | QA 계획서 |
+
+이 README의 결과 수치는 산출물 PDF의 최종 보고 기준과 현재 저장소 구조 기준을 구분해서 표기했습니다.
+
+## 프로젝트 개요
+
+AI Helpy Chat은 채팅, 검색, 에이전트, AI 생성 도구처럼 화면 상태와 비동기 응답이 자주 바뀌는 서비스입니다. 이 프로젝트는 사용자가 실제로 거치는 주요 흐름을 E2E로 검증하고, 실패했을 때 재현 가능한 증거를 남기는 데 초점을 두었습니다.
+
+핵심 목표는 세 가지였습니다.
+
+- 사용자 영향도가 큰 흐름을 Selenium 기반 UI 자동화로 검증
+- 실패 시 로그, 스크린샷, Slack/Jira 알림으로 원인 추적 가능하게 구성
+- 확인된 서비스 결함은 xfail로 분리해 CI에서 계속 추적
+
+## 검증 범위
+
+| 영역 | 검증 내용 |
+|---|---|
+| 채팅 / 검색 | 새 대화, 메시지 전송, 검색 모달, 검색 결과 이동, 검색어 초기화 |
+| LNB 관리 | 대화 생성, 삭제, 새로고침 후 유지, 선택 흐름 |
+| 에이전트 | 에이전트 생성, 검색, 필터, 내 에이전트 화면 이동 |
+| 퀴즈 생성 | 객관식/주관식 생성, 필수값, 공백값, 드롭다운, 생성 중지 |
+| PPT 생성 | 생성, 다운로드, 주제/지시사항/숫자 필드 검증, 중단, 재생성 버튼 |
+| 수업지도안 | 신규/기존 계정 기준 생성 흐름 |
+| 심층 조사 | 생성 결과, Markdown 다운로드, 입력값 검증, 재생성, 중단 |
+| 행동특성 및 종합의견 | 학교급, 학생 추가, 키워드 입력, 재생성, 초기화/롤백 |
+| 세부특기사항 | 경계값 조합, 학생 검색, 학생 추가, 초기화/롤백, 특수문자 검증 |
+| 업로드 / 다운로드 | 파일 업로드 진입, PPTX/Markdown 다운로드, 다운로드 완료 상태 |
+
+## 자동화 구조
 
 ```text
-first-project/
-├─ config/
-│  ├─ __init__.py
-│  └─ config.py                 # URL, 계정, 다운로드, Jira, Slack 설정
-├─ pages/                       # Page Object Model 클래스
-│  ├─ base_page.py              # 공통 클릭, 입력, 대기, step overlay, safe click
-│  ├─ login_page.py             # 로그인
-│  ├─ signup_page.py            # 최초 약관 동의 처리
-│  ├─ chat_page.py              # 채팅 입력, 전송, AI 응답 확인
-│  ├─ search_page.py            # 검색 모달
-│  ├─ tool_page.py              # 도구 탭 공통 진입
-│  ├─ quiz_page.py              # 퀴즈 생성
-│  ├─ ppt_page.py               # PPT 생성
-│  ├─ lesson_plan_page.py       # 수업 지도안 생성
-│  ├─ deep_investigation_page.py
-│  ├─ behavior_and_opinions_page.py
-│  ├─ detailed_specialty_page.py
-│  └─ register_page.py          # 신규 계정 생성 보조
-├─ tests/                       # Pytest 테스트 시나리오
-├─ test_data/                   # 업로드 테스트용 파일
-├─ utils/
-│  ├─ slack_notifier.py         # Slack 요약/실패 상세 알림
-│  └─ jira_notifier.py          # Jira 버그 이슈 생성 및 스크린샷 첨부
-├─ logs/                        # 테스트 로그 및 실패 스크린샷
-├─ conftest.py                  # pytest fixture, WebDriver, hook 관리
-├─ pytest.ini                   # pytest 경로, 로그, marker 설정
-├─ requirements.txt             # Python 의존성
-├─ .gitlab-ci.yml               # GitLab CI 테스트 잡
-└─ README.md
+AI_Helpy_chat/
+├── config/                 # URL, 계정, 다운로드 경로, Slack/Jira 설정
+├── pages/                  # Selenium Page Object Model
+│   ├── base_page.py        # 공통 클릭, 입력, 대기, fallback 동작
+│   ├── chat_page.py
+│   ├── quiz_page.py
+│   ├── ppt_page.py
+│   └── ...                 # 총 17개 Page Object
+├── tests/                  # pytest E2E 시나리오
+│   ├── test_message_send.py
+│   ├── test_quiz_create.py
+│   ├── test_ppt_create.py
+│   └── ...                 # 총 18개 테스트 모듈
+├── utils/                  # Slack/Jira 알림 유틸
+├── logs/                   # 실행 로그와 실패 스크린샷
+├── conftest.py             # fixture, WebDriver, hook, 실패 후처리
+├── pytest.ini              # pytest 경로, 로그, marker 설정
+├── requirements.txt        # Python 의존성
+└── .gitlab-ci.yml          # GitLab CI 테스트 파이프라인
 ```
 
-## 주요 파일 역할
+### 역할 분리
 
-| 파일 | 역할 |
+| 구성 | 역할 |
 |---|---|
-| `config/config.py` | `.env` 기반 설정값을 한곳에서 로드합니다. |
-| `conftest.py` | WebDriver, 로그인된 브라우저, API 세션, 다운로드 경로, 실패 처리 hook을 관리합니다. |
-| `pages/` | 화면별 조작 로직을 Page Object로 관리합니다. |
-| `tests/` | 실제 테스트 시나리오와 검증 로직을 관리합니다. |
-| `utils/slack_notifier.py` | 테스트 종료 요약과 실패 상세를 Slack으로 전송합니다. |
-| `utils/jira_notifier.py` | 실패 시 Jira Bug 이슈를 만들고 스크린샷을 첨부합니다. |
-| `pytest.ini` | 테스트 탐색 경로, 로그 파일, CLI 로그, marker를 정의합니다. |
-| `.gitlab-ci.yml` | GitLab Runner에서 headless UI 테스트를 실행합니다. |
+| `pages/` | 화면 조작과 locator를 Page Object로 분리해 테스트 가독성 유지 |
+| `tests/` | 사용자 시나리오와 검증 의도를 중심으로 작성 |
+| `conftest.py` | 로그인 fixture, 브라우저 옵션, 다운로드 경로, 실패 hook 관리 |
+| `utils/slack_notifier.py` | 테스트 요약과 실패 상세를 Slack으로 전송 |
+| `utils/jira_notifier.py` | 실패 케이스를 Jira Bug 이슈와 스크린샷으로 연결 |
+| `.gitlab-ci.yml` | Windows Runner에서 headless UI fast job 실행 |
 
-## 테스트 범위
+## 주요 성과
 
-현재 `pytest --collect-only -q` 기준으로 45개 테스트가 수집됩니다.
+| 항목 | 결과 |
+|---|---|
+| 총 테스트 케이스 | 198건 |
+| Pass / Fail / N/A / N/T | 180 / 9 / 9 / 0 |
+| 실행 Pass rate | 95.24% |
+| 자동화 테스트 시나리오 | 43개 |
+| 자동화 시나리오 결과 | Pass 36 / Xfail 6 / N/A 1 |
+| Critical Bug | 0건 |
 
-- 로그인 및 최초 약관 동의 후 메인 화면 진입
-- 새 채팅 생성, 메시지 전송, 기존 대화 유지 확인
-- LNB 대화 목록 생성, 새로고침, 선택, 삭제 흐름
-- 검색 모달 열기, 검색어 입력, 결과 이동, 재오픈 시 입력값 초기화
-- 모델 설정 변경 후 채팅 검증
-- 입력창 부가 기능 및 `+` 메뉴 검증
-- 파일 업로드, PPT 생성, 웹 검색 메뉴 검증
-- 퀴즈 생성, 중단, 입력값 오류, 드롭다운 검증
-- PPT 생성, 중단, 다운로드, 입력값 경계값 검증
-- 수업 지도안 생성
-- 심층 조사 생성, 필수값, 경계값, 중단 흐름 검증
-- 우리 반 AI 도구, 행동 특성 및 종합 의견, 세부 능력 특기사항, 에이전트 관련 흐름 검증
+자동화에서 발견한 주요 결함은 검색 모달 초기화, PPT 긴 숫자 입력값 변환, PPT 입력 필드 초기화, 재생성 버튼 비활성화, 특수문자 차단 누락 등이었습니다. 확인된 결함은 xfail로 분리해 CI에서 계속 추적할 수 있도록 관리했습니다.
 
-## 사전 준비
+## Troubleshooting Highlights
+
+| 문제 | 원인 | 해결 | 결과 |
+|---|---|---|---|
+| MUI Tooltip/Popover가 클릭을 방해 | 동적 레이어와 애니메이션이 Selenium click 타이밍과 충돌 | scrollIntoView, clickable wait, blocker 처리, JS fallback 공통화 | 간헐 클릭 실패 감소 |
+| StaleElementReferenceException | React rerender 후 이전 WebElement 참조 사용 | 클릭 직전 요소 재탐색, 상태 확인 재시도 | 동적 화면 전환 안정화 |
+| OS 파일 선택 다이얼로그 | Selenium이 브라우저 외부 다이얼로그를 안정적으로 제어하기 어려움 | 자동화 가능 범위와 수동 검증 범위 분리, xfail 관리 | CI 실패 노이즈 감소 |
+| Windows Runner 한글 로그 깨짐 | 기본 코드페이지와 Python 출력 인코딩 불일치 | `chcp 65001`, `PYTHONUTF8`, `PYTHONIOENCODING` 설정 | CI 로그 판독성 개선 |
+| GitLab CI 실행 시간과 환경 차이 | 브라우저 headless, 의존성 설치, 테스트 범위가 한 job에 집중 | UI fast job, pip cache, logs artifact, marker 기반 실행 | 실패 로그 회수와 반복 실행 기반 마련 |
+| 재현 버그 처리 기준 | skip 처리 시 실제 결함이 결과에서 사라질 수 있음 | xfail strict 관리 | 알려진 서비스 결함을 자동화 결과에 남김 |
+
+## 실행 가이드
+
+### 1. 설치
 
 Chrome 브라우저가 설치되어 있어야 합니다. ChromeDriver는 Selenium Manager가 자동으로 관리합니다.
 
@@ -88,15 +133,15 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-macOS/Linux 환경에서는 가상환경 활성화 명령만 아래처럼 사용합니다.
+macOS/Linux 환경에서는 가상환경 활성화 명령만 다릅니다.
 
 ```bash
 source venv/bin/activate
 ```
 
-## 환경 변수
+### 2. 환경 변수
 
-프로젝트 루트에 `.env` 파일을 만들고 필요한 값을 설정합니다. 실제 계정 정보와 토큰은 Git에 커밋하지 않습니다.
+프로젝트 루트에 `.env` 파일을 만들고 필요한 값을 설정합니다. 실제 계정, 토큰, Webhook URL은 저장소에 커밋하지 않습니다.
 
 ```env
 BASE_UI_URL=https://qaproject.elice.io
@@ -107,6 +152,7 @@ TEST_USER_PW=your_password
 
 DOWNLOAD_DIR=C:\Users\user\Downloads
 DEFAULT_API_TIMEOUT=10
+HEADLESS=false
 
 JIRA_BASE_URL=https://your-domain.atlassian.net
 JIRA_EMAIL=your_jira_email@example.com
@@ -117,16 +163,7 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 SLACK_WEBHOOK_FAILURES_URL=https://hooks.slack.com/services/...
 ```
 
-설정값 기본 동작:
-
-- `BASE_UI_URL` 기본값은 `https://qaproject.elice.io`입니다.
-- `BASE_API_URL` 기본값은 `https://dev-v2-community-api.dev.elicer.io`입니다.
-- `DOWNLOAD_DIR` 기본값은 사용자 홈의 `Downloads` 폴더입니다.
-- `HEADLESS=true`이면 Chrome을 headless 모드로 실행합니다.
-- Jira 관련 환경변수가 모두 있을 때만 실패 시 Jira 이슈를 생성합니다.
-- Slack Webhook이 없으면 Slack 알림만 생략하고 테스트는 계속 진행합니다.
-
-## 실행 방법
+### 3. 테스트 실행
 
 전체 테스트 실행:
 
@@ -137,15 +174,16 @@ pytest
 특정 테스트 파일 실행:
 
 ```bash
-pytest tests/test_search.py
+pytest tests/test_quiz_create.py
 ```
 
-특정 marker 실행:
+marker 기준 실행:
 
 ```bash
 pytest -m ui
 pytest -m slow
-pytest -m ui_slow
+pytest -m detail
+pytest -m "not slow"
 ```
 
 테스트 수집만 확인:
@@ -156,85 +194,49 @@ pytest --collect-only -q
 
 CI와 동일하게 headless 모드로 실행:
 
-```bash
+```powershell
 $env:HEADLESS="true"
 pytest
 ```
 
-## 로그와 실패 처리
+## CI/CD
 
-`pytest.ini` 설정에 따라 실행 로그는 `logs/test_run.log`에 기록됩니다.
+GitLab CI는 Windows Runner 기준으로 headless UI 테스트를 실행합니다.
 
-테스트 실패 시 `conftest.py`의 pytest hook이 다음 처리를 수행합니다.
+- `HEADLESS=true`로 브라우저를 headless 모드 실행
+- Python 후보 경로를 순차 탐색해 Runner 환경 차이 흡수
+- pip cache로 의존성 설치 시간 감소
+- `pytest -n 3 -m "not slow"`로 빠른 UI 범위 병렬 실행
+- 실패 여부와 관계없이 `logs/`와 JUnit XML을 artifact로 보관
 
-- 실패 테스트명, 파일 경로, 에러 메시지를 로그에 기록
-- WebDriver가 있는 테스트라면 현재 화면 스크린샷 저장
-- 스크린샷 저장 경로: `logs/screenshots/`
-- `SLACK_WEBHOOK_FAILURES_URL`이 있으면 실패 상세를 Slack으로 전송
-- Jira 설정이 모두 있으면 Bug 이슈 생성 후 스크린샷 첨부
-
-테스트 세션 종료 시에는 `SLACK_WEBHOOK_URL`이 설정된 경우 전체 요약을 Slack으로 전송합니다.
-단, `pytest --collect-only` 실행 시에는 Slack 요약 알림을 보내지 않습니다.
-
-## GitLab CI/CD
-
-`.gitlab-ci.yml`은 Python 3.12 이미지를 사용해 의존성을 설치하고 `pytest`를 실행합니다.
-CI 환경에서는 아래 변수가 기본 설정되어 Chrome이 headless 모드로 실행됩니다.
-
-```yaml
-variables:
-  HEADLESS: "true"
-```
-
-아침마다 확인 GitLab Runner 실행 흐름: 프로젝트 진행단계에서 CI수행하는 순서
+현재 CI fast job은 다음 파일을 대상으로 합니다.
 
 ```text
-0. 프로젝트 폴더 이동 - cd C:\Users\내이름\Desktop\my_project
-0.1 가상환경 활성화 - venv\Scripts\activate
-0.2 최신코드 가져오기 - git pull 
-1. GitLab Runner 실행 상태 확인 - cd C:\GitLab-Runner > 
-2. 코드 변경 및 로컬 테스트 - pytest
-3. git add / git commit / git push
-4. GitLab Pipeline 결과 확인 
+tests/test_quiz_create.py
+tests/test_ppt_create.py
+tests/test_deep_create.py
 ```
 
-## 작성 규칙
+## Reports & Artifacts
 
-- 화면 조작은 가능한 한 `pages/`의 Page Object 클래스에 둡니다.
-- 테스트 파일은 시나리오 흐름과 검증에 집중합니다.
-- 공통 클릭, 입력, 대기 처리는 `BasePage`의 메서드를 우선 사용합니다.
-- 긴 생성 작업은 충분한 `WebDriverWait` 시간을 둡니다.
-- 다운로드 검증이 필요한 테스트는 `DOWNLOAD_DIR` 또는 `temp_download_dir` fixture를 사용합니다.
-- 실패 분석에 필요한 정보는 로그, 스크린샷, Slack, Jira 흐름 중 적절한 위치에 남깁니다.
+`C:\Users\user\Desktop\1차 프로젝트 산출물` 폴더에는 프로젝트 진행 과정과 결과를 설명하는 산출물이 정리되어 있습니다.
 
-## 현재 상태
-
-| 항목 | 상태 |
+| 산출물 | 내용 |
 |---|---|
-| Selenium Page Object 구조 | 적용 |
-| Pytest fixture 분리 | 적용 |
-| API 인증 세션 fixture | 적용 |
-| 실패 스크린샷 자동 저장 | 적용 |
-| Jira Bug 이슈 자동 생성 | 환경변수 설정 시 동작 |
-| Slack 테스트 요약 알림 | 환경변수 설정 시 동작 |
-| Slack 실패 상세 알림 | 환경변수 설정 시 동작 |
-| GitLab CI/CD | 기본 테스트 잡 구성 |
-| 테스트 수집 검증 | 45 tests collected |
+| `QA계획서_-_AI_Helpy_Chat.pdf` | 테스트 목적, 범위, 제외 대상, 환경, 일정, 종료 기준 |
+| `QA_테스트최종결과보고서.pdf` | 최종 TC 198건 결과, Pass rate, 발견 버그, 개선 계획 |
+| `HelpyChat_QA_자동화_포트폴리오.pdf` | 자동화 구조, 검증 대상, 안정화 경험, 포트폴리오 요약 |
+| `GitLab_CI_CD_결과.pdf` | CI/CD 실행 결과와 파이프라인 구성 근거 |
+| `결함 분석 대시보드.pdf` | 결함 현황과 분류 |
+| `트러블 슈팅 10선.pdf` | 민감정보 관리, Slack/Jira, CI, 인코딩, flaky 대응 경험 |
+| `BUG_PPT_XFAIL_긴숫자_입력값_변환_리포트.pdf` | PPT 숫자 입력값 변환 결함 상세 |
+| `PPT_자동화_코드_변화_트러블슈팅_보고서.pdf` | PPT 자동화 코드 변화와 안정화 기록 |
 
-## 버전 관리 제외 대상
+## 작성 기준
 
-현재 `.gitignore`에는 다음 항목이 제외되어 있습니다.
-
-```text
-.env
-__pycache__/
-*.pyc
-.pytest_cache/
-logs/
-.DS_Store
-venv/
-.claude/
-local_changes.patch
-```
-
-parametrize 1
+- 화면 조작은 가능한 한 `pages/`의 Page Object에 둡니다.
+- 테스트 파일은 시나리오 이름과 검증 의도가 드러나게 작성합니다.
+- 공통 클릭, 입력, 대기, fallback은 `BasePage` 메서드를 우선 사용합니다.
+- 알려진 서비스 결함은 skip이 아니라 xfail로 분리해 추적합니다.
+- 실패 분석에 필요한 로그, 스크린샷, Slack/Jira 정보가 남도록 구성합니다.
+- 민감정보는 `.env`와 환경변수로 관리하고 저장소에는 커밋하지 않습니다.
