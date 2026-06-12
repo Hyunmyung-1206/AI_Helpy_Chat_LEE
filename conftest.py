@@ -160,8 +160,25 @@ def download_dir(tmp_path):
     return path
 
 
-@pytest.fixture(scope="function")
-def driver(browser, download_dir):
+def _create_webdriver(browser, options):
+    selenium_remote_url = os.getenv("SELENIUM_REMOTE_URL")
+    if selenium_remote_url:
+        return webdriver.Remote(
+            command_executor=selenium_remote_url,
+            options=options,
+        )
+
+    if browser == "chrome":
+        return webdriver.Chrome(options=options)
+    if browser == "edge":
+        return webdriver.Edge(options=options)
+    if browser == "firefox":
+        return webdriver.Firefox(options=options)
+
+    raise ValueError(f"吏?먰븯吏 ?딅뒗 釉뚮씪?곗??낅땲?? {browser}")
+
+
+def _start_webdriver(browser, download_dir):
     """
     각 테스트 함수마다 Selenium WebDriver를 초기화하고 브라우저 세션을 시작함.
     테스트 종료 후 브라우저를 닫음(Teardown).
@@ -189,7 +206,7 @@ def driver(browser, download_dir):
             }
         )
 
-        driver = webdriver.Chrome(options=options)
+        return _create_webdriver(browser, options)
 
     elif browser == "edge":
         options = EdgeOptions()
@@ -211,7 +228,7 @@ def driver(browser, download_dir):
             }
         )
 
-        driver = webdriver.Edge(options=options)
+        return _create_webdriver(browser, options)
 
     elif browser == "firefox":
         options = FirefoxOptions()
@@ -238,10 +255,18 @@ def driver(browser, download_dir):
         )
         options.set_preference("pdfjs.disabled", True)
 
-        driver = webdriver.Firefox(options=options)
+        return _create_webdriver(browser, options)
 
     else:
         raise ValueError(f"지원하지 않는 브라우저입니다: {browser}")
+
+@pytest.fixture(scope="function")
+def driver(browser, download_dir):
+    """
+    각 테스트 함수마다 Selenium WebDriver를 초기화하고 브라우저 세션을 시작함.
+    테스트 종료 후 브라우저를 닫음(Teardown).
+    """
+    driver = _start_webdriver(browser, download_dir)
 
     yield driver
 

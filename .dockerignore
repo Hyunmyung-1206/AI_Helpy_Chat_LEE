@@ -1,0 +1,10 @@
+.git
+.pytest_cache
+.uv-cache
+__pycache__
+*.pyc
+logs
+tests/logs
+resume_render_check
+.DS_Store
+venv
