@@ -73,7 +73,7 @@ PPT·퀴즈·심층 조사 기능을 중심으로 정상 흐름과 입력값 검
 
 퀴즈 생성 영역의 페이지 진입, 드롭다운 선택, 입력값 검증 등 담당 TC 일부입니다. 테스트 절차와 기대 결과를 정의하고, 실행 결과와 자동화 가능 여부를 함께 관리했습니다.
 
-[대표 TC 전체 보기](https://dirt-brand-7d0.notion.site/AI-337f6266ce2a8077a9d4ea1b6878a38d)
+[대표 TC 전체 보기](https://docs.google.com/spreadsheets/d/1R24dfcDsivm6yWTJz2Oj3y6AGdKaAZlKfFPfn8COe5Q/edit?gid=1990639038#gid=1990639038)
 
 ## 대표 시나리오
 
@@ -81,7 +81,7 @@ PPT·퀴즈·심층 조사 기능을 중심으로 정상 흐름과 입력값 검
 
 PPT 정상 생성, PPTX 다운로드 파일 검증, 주제 입력값 경계 검증 시나리오입니다. 사용자 흐름을 단계별로 정의하고 각 시나리오를 관련 TC와 연결해 추적 가능하도록 관리했습니다.
 
-[대표 시나리오 전체 보기](https://dirt-brand-7d0.notion.site/AI-337f6266ce2a8077a9d4ea1b6878a38d)
+[대표 시나리오 전체 보기](https://docs.google.com/spreadsheets/d/1R24dfcDsivm6yWTJz2Oj3y6AGdKaAZlKfFPfn8COe5Q/edit?gid=200726426#gid=200726426)
 
 ## 대표 결함 사례
 
