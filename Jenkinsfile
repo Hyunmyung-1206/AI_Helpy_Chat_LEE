@@ -18,15 +18,11 @@ pipeline {
     }
 
     stages {
-        stage('Install Dependencies') {
+        stage('Build Docker Test Image') {
             steps {
                 bat '''
                 chcp 65001
-                set PYTHONUTF8=1
-                set PYTHONIOENCODING=utf-8
-                py -3 -m venv .venv
-                .venv\\Scripts\\python -m pip install --upgrade pip
-                .venv\\Scripts\\pip install -r requirements.txt
+                docker compose build tests
                 '''
             }
         }
@@ -41,10 +37,9 @@ pipeline {
                 ]) {
                     bat '''
                     chcp 65001
-                    set PYTHONUTF8=1
-                    set PYTHONIOENCODING=utf-8
                     if not exist reports mkdir reports
-                    .venv\\Scripts\\pytest tests\\test_quiz_create.py tests\\test_ppt_create.py tests\\test_deep_create.py -n 3 --browser chrome --junitxml=reports\\junit.xml
+                    if not exist logs mkdir logs
+                    docker compose up --build --abort-on-container-exit --exit-code-from tests tests
                     '''
                 }
             }
@@ -55,6 +50,7 @@ pipeline {
         always {
             junit allowEmptyResults: true, testResults: 'reports/junit.xml'
             archiveArtifacts allowEmptyArchive: true, artifacts: 'logs/**, reports/**'
+            bat 'docker compose down --remove-orphans'
         }
     }
 }

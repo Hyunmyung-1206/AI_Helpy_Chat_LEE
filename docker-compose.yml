@@ -1,0 +1,48 @@
+services:
+  selenium:
+    image: selenium/standalone-chrome:latest
+    shm_size: 2gb
+    environment:
+      SE_NODE_MAX_SESSIONS: "3"
+      SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
+    ports:
+      - "4444:4444"
+    healthcheck:
+      test: ["CMD", "/opt/bin/check-grid.sh", "--host", "0.0.0.0", "--port", "4444"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  tests:
+    build:
+      context: .
+    depends_on:
+      selenium:
+        condition: service_healthy
+    environment:
+      BASE_UI_URL: ${BASE_UI_URL:-https://qaproject-temp.app.elice.io/ai-helpy-chat}
+      BASE_API_URL: ${BASE_API_URL:-https://dev-v2-community-api.dev.elicer.io}
+      TEST_USER_ID: ${TEST_USER_ID}
+      TEST_USER_PW: ${TEST_USER_PW}
+      JIRA_BASE_URL: ${JIRA_BASE_URL:-https://gusaud1328.atlassian.net}
+      JIRA_EMAIL: ${JIRA_EMAIL:-gusaud1328@gmail.com}
+      JIRA_API_TOKEN: ${JIRA_API_TOKEN}
+      JIRA_PROJECT_KEY: ${JIRA_PROJECT_KEY:-QA}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
+      SLACK_WEBHOOK_FAILURES_URL: ${SLACK_WEBHOOK_FAILURES_URL}
+      DEFAULT_API_TIMEOUT: ${DEFAULT_API_TIMEOUT:-10}
+      HEADLESS: "true"
+      SELENIUM_REMOTE_URL: http://selenium:4444/wd/hub
+    volumes:
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+    command:
+      - pytest
+      - tests/test_quiz_create.py
+      - tests/test_ppt_create.py
+      - tests/test_deep_create.py
+      - -n
+      - "3"
+      - --browser
+      - chrome
+      - --junitxml=reports/junit.xml

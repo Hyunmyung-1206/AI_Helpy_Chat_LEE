@@ -1,0 +1,14 @@
+.env
+.git
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+logs
+reports
+.DS_Store
+.claude
+docs
+local_changes.patch
+counter.txt
