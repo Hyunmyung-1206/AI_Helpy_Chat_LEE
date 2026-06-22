@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage('Run Quiz Tests') {
+        stage('Run UI Tests') {
             steps {
                 withCredentials([
                     string(credentialsId: 'test-user-password', variable: 'TEST_USER_PW'),
@@ -37,7 +37,7 @@ pipeline {
                 ]) {
                     bat '''
                     if not exist reports mkdir reports
-                    .venv\\Scripts\\pytest tests\\test_quiz_create.py -m "not slow" -n 3 --browser chrome --junitxml=reports\\junit.xml
+                    .venv\\Scripts\\pytest tests\\test_quiz_create.py tests\\test_ppt_create.py tests\\test_deep_create.py -m "not slow" -n 3 --browser chrome --junitxml=reports\\junit.xml
                     '''
                 }
             }
