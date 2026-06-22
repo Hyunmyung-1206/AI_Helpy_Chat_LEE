@@ -1,2 +1,0 @@
-파일 업로드 기능 검증용 테스트 파일입니다.
-This is a test file for TC-013 file upload verification.
