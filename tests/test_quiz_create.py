@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 
 import quiz_create_base as base
@@ -8,7 +9,10 @@ import quiz_create_base as base
 logger = logging.getLogger(__name__)
 
 
+@allure.feature("Quiz Create")
 class TestQuizCreate(base.QuizCreateBase):
+    @allure.story("Topic input validation")
+    @allure.title("퀴즈 주제 입력값 검증")
     @pytest.mark.detail
     def test_quiz_topic_input_validation(self, logged_in_driver):
         """
@@ -63,6 +67,8 @@ class TestQuizCreate(base.QuizCreateBase):
         self.show_step(page, 4, "5000자 주제 입력값 확인")
         logger.info(f"[{scenario}] 5000자 입력 확인 완료")
 
+    @allure.story("Quiz type dropdown")
+    @allure.title("퀴즈 유형 드롭다운 검증")
     @pytest.mark.detail
     def test_quiz_type_dropdown(self, logged_in_driver):
         """
@@ -96,6 +102,8 @@ class TestQuizCreate(base.QuizCreateBase):
         self.show_step(page, 4, "유형 선택값 반영 및 드롭다운 닫힘 확인")
         logger.info(f"[{scenario}] 유형 선택 및 드롭다운 닫힘 확인")
 
+    @allure.story("Difficulty dropdown")
+    @allure.title("퀴즈 난이도 드롭다운 검증")
     @pytest.mark.detail
     def test_quiz_difficulty_dropdown(self, logged_in_driver):
         """
@@ -135,6 +143,8 @@ class TestQuizCreate(base.QuizCreateBase):
         self.show_step(page, 4, "하 난이도 선택값 반영 및 드롭다운 닫힘 확인")
         logger.info(f"[{scenario}] 하 난이도 선택 및 드롭다운 닫힘 확인")
 
+    @allure.story("Topic delete button state")
+    @allure.title("퀴즈 주제 삭제 시 다시 생성 버튼 상태 검증")
     @pytest.mark.detail
     def test_quiz_topic_delete_disables_submit_button(self, logged_in_driver):
         """
@@ -173,6 +183,8 @@ class TestQuizCreate(base.QuizCreateBase):
         self.show_step(page, 4, "주제 입력 후 다시 생성 버튼 활성화 확인")
         logger.info(f"[{scenario}] 주제 재입력 후 다시 생성 버튼 활성화 확인 완료")
 
+    @allure.story("Blank topic validation")
+    @allure.title("퀴즈 공백 주제 입력 시 버튼 비활성화 검증")
     @pytest.mark.detail
     def test_quiz_blank_topic_disables_submit_button(self, logged_in_driver):
         """
@@ -205,6 +217,8 @@ class TestQuizCreate(base.QuizCreateBase):
         self.show_step(page, 4, "공백 주제 필수 에러 메시지 확인")
         logger.info(f"[{scenario}] 공백 주제 에러 메시지: {error_message}")
 
+    @allure.story("Generation stop")
+    @allure.title("퀴즈 생성 중지 검증")
     @pytest.mark.detail
     def test_quiz_create_stop(self, logged_in_driver):
         """

@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -8,7 +9,10 @@ import deep_create_base as base
 
 logger = logging.getLogger(__name__)
 
+@allure.feature("Deep Investigation Create")
 class TestDeepInvestigation(base.DeepInvestigationBase):
+    @allure.story("Topic validation")
+    @allure.title("심층 조사 주제 입력값 검증")
     @pytest.mark.detail
     def test_topic_validation(self, logged_in_driver):
         """
@@ -68,6 +72,8 @@ class TestDeepInvestigation(base.DeepInvestigationBase):
         self.show_step(page, 9, "복합 정상 주제 입력값 유지 및 버튼 활성화 확인")
         logger.info(f"[{scenario}] 복합 정상 주제 입력값 검증 완료: {base.VALID_COMPLEX_TOPIC}")
 
+    @allure.story("Known issue")
+    @allure.title("심층 조사 공백 주제 Known Issue")
     @pytest.mark.detail
     @pytest.mark.xfail(
         reason="Known issue: 공백만 있는 주제가 유효값으로 처리되어 다시 생성 버튼이 활성화됨"
@@ -97,6 +103,8 @@ class TestDeepInvestigation(base.DeepInvestigationBase):
         self.show_step(page, 4, "에러 메시지 및 다시 생성 버튼 비활성화 확인")
         logger.info(f"[{scenario}] 에러메시지 : {error_message}")
 
+    @allure.story("Instructions validation")
+    @allure.title("심층 조사 지시사항 입력값 검증")
     @pytest.mark.detail
     def test_instructions_validation(self, logged_in_driver):
         """
@@ -137,6 +145,8 @@ class TestDeepInvestigation(base.DeepInvestigationBase):
         self.show_step(page, 6, "지시사항 2001자 에러 메시지 및 버튼 비활성화 확인")
         logger.info(f"[{scenario}] 에러메시지 : {error_message}")
 
+    @allure.story("Regenerate button state")
+    @allure.title("심층 조사 다시 생성 버튼 상태 검증")
     @pytest.mark.detail
     def test_regenerate_button_state(self, logged_in_driver):
         """
@@ -185,6 +195,8 @@ class TestDeepInvestigation(base.DeepInvestigationBase):
         self.show_step(page, 7, "다시 생성 확인 모달 노출 확인")
         logger.info(f"[{scenario}] 다시 생성 확인 모달 노출 확인 완료")
 
+    @allure.story("Generation stop")
+    @allure.title("심층 조사 생성 중지 검증")
     @pytest.mark.detail
     def test_deep_generation_stop(self, logged_in_driver):
         """

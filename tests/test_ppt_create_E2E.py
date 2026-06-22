@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 
 import ppt_create_base as base
@@ -8,7 +9,10 @@ import ppt_create_base as base
 logger = logging.getLogger(__name__)
 
 
+@allure.feature("PPT Create")
+@allure.story("E2E generation")
 class TestPptCreateE2E(base.PptCreateBase):
+    @allure.title("PPT 전체 옵션 생성 E2E")
     @pytest.mark.slow
     def test_ppt_create_full_option(self, logged_in_driver):
         """
@@ -34,6 +38,7 @@ class TestPptCreateE2E(base.PptCreateBase):
         self.start_generation(page, scenario)
         self.wait_generation_complete(page, scenario)
 
+    @allure.title("PPT 다운로드 파일 계약 검증 E2E")
     @pytest.mark.slow
     def test_ppt_download_file_contract(self, logged_in_driver, download_dir):
         """

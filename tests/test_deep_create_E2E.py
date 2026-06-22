@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -9,7 +10,10 @@ import deep_create_base as base
 logger = logging.getLogger(__name__)
 
 
+@allure.feature("Deep Investigation Create")
+@allure.story("E2E generation")
 class TestDeepInvestigationE2E(base.DeepInvestigationBase):
+    @allure.title("심층 조사 생성 결과 E2E")
     @pytest.mark.slow
     def test_full_generation_result(self, logged_in_driver):
         """
@@ -41,6 +45,7 @@ class TestDeepInvestigationE2E(base.DeepInvestigationBase):
         self.show_step(page, 8, "생성 결과 영역 노출 확인")
         logger.info(f"[{scenario}] 생성 결과 영역 노출 확인 완료")
 
+    @allure.title("심층 조사 Markdown 다운로드 E2E")
     @pytest.mark.slow
     def test_markdown_download_result(self, logged_in_driver, temp_download_dir):
         """

@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 
 import quiz_create_base as base
@@ -8,7 +9,10 @@ import quiz_create_base as base
 logger = logging.getLogger(__name__)
 
 
+@allure.feature("Quiz Create")
+@allure.story("E2E generation")
 class TestQuizCreateE2E(base.QuizCreateBase):
+    @allure.title("퀴즈 객관식 생성 E2E")
     @pytest.mark.slow
     def test_quiz_create(self, logged_in_driver):
         """
@@ -37,6 +41,7 @@ class TestQuizCreateE2E(base.QuizCreateBase):
         assert page.is_quiz_result_visible(), "퀴즈 생성 결과가 표시되지 않았습니다."
         logger.info(f"[{scenario}] 생성 완료 확인")
 
+    @allure.title("퀴즈 주관식 생성 E2E")
     @pytest.mark.slow
     def test_quiz_create_subjective_type(self, logged_in_driver):
         """

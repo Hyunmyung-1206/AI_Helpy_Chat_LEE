@@ -1,5 +1,6 @@
 import logging
 
+import allure
 import pytest
 
 import ppt_create_base as base
@@ -8,7 +9,10 @@ import ppt_create_base as base
 logger = logging.getLogger(__name__)
 
 
+@allure.feature("PPT Create")
 class TestPptCreate(base.PptCreateBase):
+    @allure.story("Topic validation")
+    @allure.title("PPT 주제 입력값 검증")
     @pytest.mark.detail
     def test_ppt_topic_validation(self, logged_in_driver):
         """
@@ -59,6 +63,8 @@ class TestPptCreate(base.PptCreateBase):
         self.assert_topic_error_hidden(page)
         page.show_step("Step.7 한글 / 영문 대소문자 / 숫자 / 특수문자 / 띄어쓰기 주제 입력 확인")
 
+    @allure.story("Instructions validation")
+    @allure.title("PPT 지시사항 입력값 검증")
     @pytest.mark.detail
     def test_ppt_instructions_validation(self, logged_in_driver):
         """
@@ -105,6 +111,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step("Step.5 지시사항 2001자 에러 메시지 확인")
         logger.info(f"[{scenario}] 지시사항 2001자 에러 메시지: {error_message}")
 
+    @allure.story("Slide count boundary")
+    @allure.title("PPT 슬라이드 수 경계값 검증")
     @pytest.mark.detail
     @pytest.mark.parametrize(
         "slides_count, expected_error, field_name",
@@ -151,6 +159,8 @@ class TestPptCreate(base.PptCreateBase):
             self.assert_count_error_hidden(actual_error, field_name)
             page.show_step(f"Step.4 {field_name} 정상 입력 확인")
 
+    @allure.story("Section count boundary")
+    @allure.title("PPT 섹션 수 경계값 검증")
     @pytest.mark.detail
     @pytest.mark.parametrize(
         "section_count, expected_error, field_name",
@@ -196,6 +206,8 @@ class TestPptCreate(base.PptCreateBase):
             self.assert_count_error_hidden(actual_error, field_name)
             page.show_step(f"Step.4 {field_name} 정상 입력 확인")
 
+    @allure.story("Numeric field validation")
+    @allure.title("PPT 슬라이드/섹션 수 0 입력 차단 검증")
     @pytest.mark.detail
     @pytest.mark.parametrize(
         "enter_method_name, get_method_name, field_name",
@@ -242,6 +254,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step(f"Step.3 {field_name} 0 입력 불가 확인")
         logger.info(f"[{scenario}] {field_name} 0 입력 불가 확인 완료")
 
+    @allure.story("Numeric field validation")
+    @allure.title("PPT 숫자 필드 문자 입력 검증")
     @pytest.mark.detail
     @pytest.mark.parametrize(
         "enter_method_name, get_method_name, field_name",
@@ -290,6 +304,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step(f"Step.3 {field_name} 필드 문자 포함 입력 시 숫자만 반영 확인")
         logger.info(f"[{scenario}] {field_name} 문자 포함 입력값 검증 완료")
 
+    @allure.story("Known issue")
+    @allure.title("PPT 긴 숫자 입력값 변환 Known Issue")
     @pytest.mark.detail
     @pytest.mark.xfail(
         reason="Known issue: 숫자 입력 필드의 긴 숫자 입력값이 지수 표기/Infinity로 변환됨",
@@ -330,6 +346,8 @@ class TestPptCreate(base.PptCreateBase):
         )
         page.show_step(f"Step.4 {field_name} 긴 입력값 원본 유지 확인")
 
+    @allure.story("Generate button state")
+    @allure.title("PPT 생성 버튼 상태 검증")
     @pytest.mark.detail
     def test_ppt_generate_button_state(self, logged_in_driver):
         """
@@ -377,6 +395,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step("Step.7 전체 입력값 입력 상태 생성 버튼 활성화 확인")
         logger.info(f"[{scenario}] 전체 입력값 입력 상태 생성 버튼 활성화 확인 완료")
 
+    @allure.story("Topic delete button state")
+    @allure.title("PPT 주제 삭제 시 생성 버튼 비활성화 검증")
     @pytest.mark.detail
     def test_ppt_topic_delete_disables_generate_button(self, logged_in_driver):
         """
@@ -405,6 +425,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step("Step.4 주제 입력값 삭제 후 다시생성 버튼 비활성화 확인")
         logger.info(f"[{scenario}] 주제 입력값 삭제 후 다시생성 버튼 비활성화 확인 완료")
 
+    @allure.story("Known issue")
+    @allure.title("PPT 공백 주제 버튼 활성화 Known Issue")
     @pytest.mark.detail
     @pytest.mark.xfail(
         reason="Known issue: 공백만 있는 주제가 유효값으로 처리되어 다시생성 버튼이 활성화됨"
@@ -431,6 +453,8 @@ class TestPptCreate(base.PptCreateBase):
         page.show_step("Step.3 공백만 있는 주제 에러 메시지 및 다시생성 버튼 비활성화 확인")
         logger.info(f"[{scenario}] 공백 주제 에러 메시지: {blank_error}")
 
+    @allure.story("Generation stop")
+    @allure.title("PPT 생성 중지 검증")
     @pytest.mark.detail
     def test_ppt_create_stop(self, logged_in_driver):
         """
