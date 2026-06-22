@@ -1,7 +1,6 @@
 # AI Helpy Chat QA Automation
 
-> AI Helpy Chat의 Quiz, PPT, Deep Investigation 생성 기능을 Selenium + pytest로 자동 검증하는 QA 자동화 프로젝트입니다.  
-> Docker Compose 기반 Selenium 실행 환경과 Jenkins CI를 구성하고, Allure Report, Slack, Jira 연동으로 테스트 결과 추적까지 자동화했습니다.
+> AI Helpy Chat의 Quiz, PPT, Deep Investigation 생성 기능을 수동 QA와 자동화 테스트로 검증한 QA 자동화 프로젝트입니다.
 
 ![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-9.x-0A9EDC?logo=pytest&logoColor=white)
@@ -12,139 +11,194 @@
 
 ---
 
-## Key Achievements
+## 핵심 성과
 
-| Area | Implementation |
+| 구분 | 성과 |
 |---|---|
-| Test target | Quiz, PPT, Deep Investigation 생성 기능 |
-| Test design | 입력값 검증, 경계값 분석, 버튼 상태, 생성 중지, 다운로드 검증 |
-| Test structure | 상세 테스트와 slow E2E 테스트 분리 |
-| Parallel run | `pytest-xdist` 3 workers |
-| Docker | `tests` 컨테이너와 `selenium/standalone-chrome` 컨테이너 분리 |
-| CI | Jenkins Pipeline에서 Docker Compose 기반 테스트 실행 |
-| Report | JUnit XML + Allure Report |
-| Notification | Slack 요약/실패 알림, Jira 이슈 연동 |
-| Known issue | `pytest.mark.xfail`로 알려진 버그 추적 |
+| TC 설계 | 전체 198건 중 94건 담당 |
+| 시나리오 설계 | 전체 43개 중 28개 담당 |
+| 결함 관리 | 버그 리포트 5건 작성 및 추적 |
+| 트러블슈팅 | 자동화 구축 중 발생 이슈 21건 기록 |
+| 자동화 테스트 | Quiz/PPT/Deep 상세 테스트 30건 구성 |
+| 회귀 관리 | known issue 4건을 `pytest.mark.xfail`로 추적 |
+| CI/CD | Docker Compose + Jenkins + Allure Report 연동 |
 
 ---
 
-## Tech Stack
+## 프로젝트 정보
 
-| Category | Tools |
+| 항목 | 내용 |
 |---|---|
-| Language | Python 3.14 |
-| Test framework | pytest, pytest-xdist |
-| UI automation | Selenium WebDriver |
-| Browser runtime | selenium/standalone-chrome |
-| Container | Docker, Docker Compose |
-| CI | Jenkins Declarative Pipeline |
-| Report | JUnit, Allure Report |
-| Integration | Slack Incoming Webhook, Jira API |
-| Config | python-dotenv, Jenkins Credentials |
+| 플랫폼 | AI Helpy Chat |
+| 테스트 범위 | Quiz Create, PPT Create, Deep Investigation Create |
+| 담당 역할 | TC/시나리오 설계, 기능/예외/경계값 테스트, 자동화, 결과 문서화 |
+| 테스트 환경 | Windows, Docker Desktop, Jenkins local |
+| 브라우저 | Chrome |
+| 자동화 도구 | Python, Selenium, pytest, pytest-xdist |
+| CI/리포트 | Docker Compose, Jenkins, JUnit XML, Allure Report |
+| 협업/추적 | Notion, GitHub, Jira, Slack |
+| QA 산출물 | [Notion 상세 문서](https://dirt-brand-7d0.notion.site/AI-337f6266ce2a8077a9d4ea1b6878a38d) |
 
 ---
 
-## Test Scope
+## 담당 역할
 
-### Quiz Create
-
-- 주제 입력값 검증
-- 퀴즈 유형 드롭다운 검증
-- 난이도 드롭다운 검증
-- 주제 삭제 시 버튼 상태 검증
-- 공백 주제 검증
-- 생성 중지 검증
-- slow E2E 생성 검증
-
-### PPT Create
-
-- 주제/지시사항 입력값 검증
-- 슬라이드 수, 섹션 수 경계값 검증
-- 숫자 필드 비정상 입력 검증
-- 생성 버튼 상태 검증
-- 공백 주제 known issue 추적
-- 생성 중지 검증
-- slow E2E 생성 및 다운로드 검증
-
-### Deep Investigation Create
-
-- 주제/지시사항 입력값 검증
-- 다시 생성 버튼 상태 검증
-- 공백 주제 known issue 추적
-- 생성 중지 검증
-- slow E2E 생성 및 Markdown 다운로드 검증
+- 전체 TC 198건 중 **94건** 담당
+- 전체 시나리오 43개 중 **28개** 담당
+- Quiz/PPT/Deep 생성 기능 중심의 기능 테스트 수행
+- 공백 입력, 긴 문자열, 숫자 필드 등 예외/경계값 테스트 수행
+- 버그 리포트 및 결과 리포트 작성
+- 수정 확인을 위한 회귀 테스트 진행
+- Selenium + pytest 기반 UI 자동화 테스트 작성
+- Docker/Jenkins/Allure 기반 CI 리포트 흐름 구성
 
 ---
 
-## Test Design Strategy
+## 테스트 전략
 
-이 프로젝트는 단순한 UI 클릭 자동화가 아니라, 생성 기능의 주요 리스크를 기준으로 테스트를 분리했습니다.
-
-- **경계값 분석**: 주제 길이, 지시사항 길이, PPT 슬라이드/섹션 수
-- **입력값 검증**: 공백, 특수문자, 긴 숫자, 문자 포함 숫자 입력
-- **상태 검증**: 버튼 활성/비활성, 드롭다운 선택 상태, 생성 중지 메시지
-- **E2E 검증**: 생성 완료, 결과 영역 표시, 다운로드 결과 확인
-- **Known issue 관리**: 알려진 결함은 skip하지 않고 `xfail`로 추적
+| 전략 | 검증 내용 |
+|---|---|
+| 기능 테스트 | Quiz/PPT/Deep 생성, 옵션 선택, 다운로드, 생성 중지 |
+| 예외 테스트 | 공백 입력, 긴 문자열, 숫자 필드 비정상 입력 |
+| 경계값 분석 | 주제 길이, 지시사항 길이, PPT 슬라이드/섹션 수 |
+| 상태 검증 | 버튼 활성/비활성, 드롭다운 선택 상태, 생성 중 메시지 |
+| 회귀 테스트 | known issue를 `xfail`로 남겨 수정 여부 추적 |
+| 자동화 분리 | 상세 테스트와 slow E2E 테스트를 분리해 CI 실행 시간 관리 |
 
 ---
 
-## Project Structure
+## 주요 테스트 케이스
+
+| 기능 | 대표 TC | 검증 포인트 |
+|---|---|---|
+| Quiz | 주제 입력값 검증 | 유효/무효 주제 입력 시 버튼 상태와 결과 확인 |
+| Quiz | 유형/난이도 드롭다운 검증 | 옵션 선택 상태 유지 여부 확인 |
+| PPT | 슬라이드 수 경계값 검증 | 최소/최대/초과 입력 처리 확인 |
+| PPT | 긴 숫자 입력값 검증 | 지수 표기 또는 `Infinity` 변환 이슈 추적 |
+| PPT | 공백 주제 검증 | 공백만 입력해도 생성 버튼이 활성화되는 결함 추적 |
+| Deep | 공백 주제 검증 | 공백 주제 입력 시 버튼 상태 결함 추적 |
+| Deep | 다시 생성 버튼 상태 검증 | 입력값 변경 후 버튼 활성 조건 확인 |
+
+전체 담당 테스트 설계 문서는 GitHub에서 바로 확인할 수 있습니다.
+
+- [전체 담당 TC 94건 보기](qa-artifacts/test-cases.md)
+- [담당 테스트 시나리오 28개 보기](qa-artifacts/test-scenarios.md)
+
+---
+
+## 대표 이슈 보드
+
+### PPT 숫자 입력 필드의 긴 숫자가 지수 표기 또는 Infinity로 변환되는 문제
+
+| 항목 | 내용 |
+|---|---|
+| 관련 TC | `TC_066`, `TC_067`, `TC_073`, `TC_079`, `TC_080` |
+| 발생 조건 | PPT 슬라이드 수 또는 섹션 수 입력 필드에 매우 긴 숫자 입력 |
+| 기대 결과 | 입력값이 의도와 다르게 변환되지 않거나 유효성 에러로 제어되어야 함 |
+| 실제 결과 | 일부 긴 숫자 입력값이 지수 표기 또는 `Infinity`로 변환됨 |
+| 재현 절차 | PPT 생성 화면 진입 -> 슬라이드 수/섹션 수 필드에 긴 숫자 입력 -> 입력 필드 표시값 확인 |
+| 영향 | 사용자가 의도하지 않은 숫자 값으로 PPT 생성 요청을 보낼 수 있음 |
+| 추적 방식 | 자동화 테스트에 `xfail`로 등록해 수정 여부를 회귀 테스트에서 확인 |
+| 상세 문서 | [Notion 버그 리포트 5건](https://dirt-brand-7d0.notion.site/AI-337f6266ce2a8077a9d4ea1b6878a38d) |
+
+---
+
+## 자동화 구조
 
 ```text
-AI_Helpy_chat/
-├─ config/                  # 환경변수 기반 설정
-├─ pages/                   # Page Object Model
-├─ tests/                   # pytest 테스트
-│  ├─ *_create.py           # 상세 검증 테스트
-│  ├─ *_create_E2E.py       # slow E2E 테스트
-│  └─ *_create_base.py      # 테스트 공통 상수/helper
-├─ utils/                   # Slack/Jira 알림 유틸
-├─ Dockerfile               # 테스트 실행 이미지
-├─ docker-compose.yml       # Selenium + tests 컨테이너 구성
-├─ Jenkinsfile              # Jenkins CI Pipeline
-├─ pytest.ini               # pytest 설정
-└─ requirements.txt         # Python dependencies
+GitHub push
+  -> Jenkins Pipeline
+  -> Docker golden image / test image build
+  -> selenium/standalone-chrome container
+  -> tests container에서 pytest-xdist 실행
+  -> JUnit XML + Allure Report publish
+  -> Slack/Jira 알림 및 이슈 추적
 ```
 
----
+### Docker 테스트 파이프라인
 
-## Environment Variables
+```text
+1. Jenkins가 GitHub push를 감지해 Pipeline 시작
+2. docker compose build tests로 테스트 실행 이미지 빌드
+3. selenium/standalone-chrome 컨테이너 실행 및 healthcheck 통과 대기
+4. tests 컨테이너에서 pytest 상세 테스트 30건 실행
+5. pytest-xdist 3 workers로 병렬 실행
+6. reports/junit.xml, allure-results/, logs/ 산출물 생성
+7. Jenkins post 단계에서 JUnit/Allure publish 및 artifact 보관
+8. docker compose down --remove-orphans로 컨테이너 정리
+```
 
-실제 값은 `.env` 또는 Jenkins Credentials로 관리하며, Git에 커밋하지 않습니다.
-
-| Variable | Description |
+| 단계 | 역할 |
 |---|---|
-| `BASE_UI_URL` | 테스트 대상 UI URL |
-| `BASE_API_URL` | API base URL |
-| `TEST_USER_ID` | 테스트 계정 ID |
-| `TEST_USER_PW` | 테스트 계정 비밀번호 |
-| `JIRA_BASE_URL` | Jira base URL |
-| `JIRA_EMAIL` | Jira 계정 이메일 |
-| `JIRA_API_TOKEN` | Jira API token |
-| `JIRA_PROJECT_KEY` | Jira project key |
-| `SLACK_WEBHOOK_URL` | 테스트 요약 Slack webhook |
-| `SLACK_WEBHOOK_FAILURES_URL` | 실패 상세 Slack webhook |
-| `HEADLESS` | headless 브라우저 실행 여부 |
-| `SELENIUM_REMOTE_URL` | Selenium Remote WebDriver URL |
+| Golden image | Python 3.14, pytest, Selenium, Allure 의존성을 고정한 기준 이미지 |
+| Test image | 골든 이미지 위에 현재 프로젝트 코드를 복사한 실행 이미지 |
+| Selenium container | `selenium/standalone-chrome`로 Chrome 브라우저 제공 |
+| Tests container | `pytest -n 3`으로 Quiz/PPT/Deep 상세 테스트 실행 |
+| Volume mount | `logs/`, `reports/`, `allure-results/`를 Jenkins workspace로 보존 |
+| Jenkins post | JUnit XML, Allure Report, 로그 산출물을 수집하고 컨테이너 정리 |
+
+| 구성 | 역할 |
+|---|---|
+| `tests/*_create.py` | CI에서 실행하는 상세 검증 테스트 |
+| `tests/*_create_E2E.py` | 필요 시 별도 실행하는 slow E2E 테스트 |
+| `tests/*_create_base.py` | 테스트 공통 상수와 helper |
+| `pages/` | Page Object Model |
+| `Dockerfile.golden` | 로컬 기준 Python/pytest/Selenium 골든 이미지 |
+| `docker-compose.yml` | Selenium Chrome 컨테이너와 tests 컨테이너 분리 |
+| `Jenkinsfile` | Docker 기반 테스트 실행과 리포트 수집 |
 
 ---
 
-## Run Tests
+## 캡처 기반 증빙
+
+Jenkins, Allure, Docker는 로컬 환경에서 동작하므로 공개 URL 대신 캡처 이미지로 증빙합니다.
+
+| 증빙 | 파일 위치 |
+|---|---|
+| Jenkins Pipeline 실행 화면 | `assets/readme/jenkins-pipeline.png` |
+| Allure Report 결과 화면 | `assets/readme/allure-report.png` |
+| Docker Desktop 이미지/컨테이너 화면 | `assets/readme/docker-desktop.png` |
+| Notion QA 산출물 화면 | `assets/readme/notion-docs.png` |
+
+---
+
+## 개선 제안
+
+| 개선 포인트 | 제안 |
+|---|---|
+| 입력값 초기화 | 페이지를 나갔다 돌아와도 입력값이 남아 새 문서 작성 시 직접 삭제가 필요함 |
+| 사용자 흐름 개선 | `초기화` 버튼 또는 `새로 작성` 플로우를 제공하면 반복 생성 작업이 쉬워짐 |
+| 자동화 안정성 | Docker/Selenium 환경에서 일부 Deep 테스트 timeout 이력이 있어 wait 조건 개선 필요 |
+
+---
+
+## 회고
+
+### 잘한 점
+
+- 정상 흐름뿐 아니라 공백, 긴 문자열, 경계값 같은 예외 조건을 검증해 실제 결함을 발견했습니다.
+- 상세 테스트와 slow E2E 테스트를 분리해 CI에서 빠르게 돌릴 수 있는 구조를 만들었습니다.
+- Docker와 Jenkins를 연결해 로컬 환경 차이를 줄이고 반복 실행 가능한 테스트 환경을 구성했습니다.
+
+### 아쉬운 점
+
+- 초반에는 정상 흐름 위주로 테스트해 예외 케이스 발견이 늦었습니다.
+- Jenkins/Allure/Docker가 로컬 기반이라 외부에서 바로 접근 가능한 공개 리포트로 보여주기 어렵습니다.
+
+### 다음 개선
+
+- Docker 골든 이미지를 기준으로 자동화 실행 환경을 더 안정화하고 싶습니다.
+- 실패 시 스크린샷과 page source를 Allure attachment로 남겨 디버깅 속도를 높이고 싶습니다.
+- 예외/경계값 중심의 TC 설계를 더 빠른 단계에서 적용하고 싶습니다.
+
+---
+
+## 실행 방법
 
 ### Docker Compose
 
-Docker 환경에서는 `tests` 컨테이너가 pytest를 실행하고, `selenium` 컨테이너가 Chrome 브라우저를 제공합니다.
-
 ```bash
 docker compose up --build --abort-on-container-exit --exit-code-from tests tests
-```
-
-테스트 완료 후 생성되는 주요 산출물:
-
-```text
-reports/junit.xml
-allure-results/
-logs/
 ```
 
 ### Local pytest
@@ -155,82 +209,12 @@ pytest tests/test_quiz_create.py tests/test_ppt_create.py tests/test_deep_create
 
 ### Slow E2E
 
-기본 CI에서는 상세 테스트만 실행하고, slow E2E는 필요할 때 별도로 실행합니다.
-
 ```bash
 pytest tests/test_quiz_create_E2E.py tests/test_ppt_create_E2E.py tests/test_deep_create_E2E.py -m slow --browser chrome
 ```
 
 ---
 
-## Jenkins CI Pipeline
+## 보안 관리
 
-Jenkins는 GitHub push를 감지해 Docker 기반 테스트 파이프라인을 실행합니다.
-
-```text
-GitHub push
-  -> Jenkins Pipeline
-  -> Docker test image build
-  -> selenium/standalone-chrome healthcheck
-  -> tests container pytest run
-  -> JUnit result publish
-  -> Allure Report publish
-  -> logs/reports/allure-results archive
-```
-
-Pipeline 주요 stage:
-
-- `Build Docker Test Image`
-- `Run UI Tests`
-- `post`: JUnit, Allure, artifact archive, Docker Compose cleanup
-
----
-
-## Allure Report
-
-Allure는 테스트 결과를 기능과 시나리오 단위로 확인하기 위해 사용합니다.
-
-- `allure-pytest`로 `allure-results/` 생성
-- `@allure.feature`, `@allure.story`, `@allure.title`로 테스트 분류
-- Jenkins Allure Plugin으로 빌드별 리포트 publish
-
-현재는 테스트 메타데이터 중심으로 구성되어 있으며, 단계별 `allure.step`과 실패 스크린샷 attachment는 향후 개선 항목입니다.
-
----
-
-## Slack & Jira Integration
-
-테스트 실행 결과는 Slack과 Jira로 추적할 수 있도록 구성했습니다.
-
-- 테스트 세션 종료 후 Slack 요약 알림 전송
-- 실패 테스트 발생 시 상세 Slack 알림 전송
-- Jira 설정이 존재할 경우 실패 케이스 이슈 생성 및 스크린샷 첨부
-- Slack/Jira 연동 실패가 테스트 실행 자체를 방해하지 않도록 예외 처리
-
----
-
-## Known Issues & Current Notes
-
-- 알려진 결함은 `pytest.mark.xfail`로 관리합니다.
-- 현재 known issue 예시:
-  - PPT 긴 숫자 입력값이 지수 표기 또는 `Infinity`로 변환되는 이슈
-  - PPT 공백 주제가 유효값으로 처리되는 이슈
-  - Deep Investigation 공백 주제가 유효값으로 처리되는 이슈
-- Docker/Selenium 환경에서 Deep 상세 테스트 일부가 `TimeoutException`으로 실패한 이력이 있어, selector 안정성 또는 대기 조건 개선이 필요합니다.
-
----
-
-## Git Safety
-
-아래 파일과 산출물은 Git에 커밋하지 않습니다.
-
-```text
-.env
-.venv/
-logs/
-reports/
-allure-results/
-allure-report/
-__pycache__/
-```
-
+`.env`, Slack Webhook, Jira API Token, 테스트 계정 비밀번호는 Git에 커밋하지 않고 로컬 `.env` 또는 Jenkins Credentials로 관리합니다.

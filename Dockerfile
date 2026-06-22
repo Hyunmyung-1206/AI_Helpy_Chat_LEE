@@ -1,15 +1,6 @@
-FROM python:3.14-slim
-
-ENV PYTHONUTF8=1 \
-    PYTHONIOENCODING=utf-8 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+FROM ai-helpy-chat-golden:local
 
 WORKDIR /app
-
-COPY requirements.txt .
-RUN python -m pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
