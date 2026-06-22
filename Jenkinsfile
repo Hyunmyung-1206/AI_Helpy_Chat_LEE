@@ -21,6 +21,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 bat '''
+                chcp 65001
+                set PYTHONUTF8=1
+                set PYTHONIOENCODING=utf-8
                 py -3 -m venv .venv
                 .venv\\Scripts\\python -m pip install --upgrade pip
                 .venv\\Scripts\\pip install -r requirements.txt
@@ -37,6 +40,9 @@ pipeline {
                     string(credentialsId: 'slack-webhook-failures', variable: 'SLACK_WEBHOOK_FAILURES_URL')
                 ]) {
                     bat '''
+                    chcp 65001
+                    set PYTHONUTF8=1
+                    set PYTHONIOENCODING=utf-8
                     if not exist reports mkdir reports
                     .venv\\Scripts\\pytest tests\\test_quiz_create.py tests\\test_ppt_create.py tests\\test_deep_create.py -n 3 --browser chrome --junitxml=reports\\junit.xml
                     '''
