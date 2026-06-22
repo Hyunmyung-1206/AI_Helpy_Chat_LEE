@@ -36,6 +36,7 @@ services:
     volumes:
       - ./logs:/app/logs
       - ./reports:/app/reports
+      - ./allure-results:/app/allure-results
     command:
       - pytest
       - tests/test_quiz_create.py
@@ -46,3 +47,5 @@ services:
       - --browser
       - chrome
       - --junitxml=reports/junit.xml
+      - --alluredir=allure-results
+      - --clean-alluredir

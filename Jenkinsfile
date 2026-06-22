@@ -49,7 +49,14 @@ pipeline {
     post {
         always {
             junit allowEmptyResults: true, testResults: 'reports/junit.xml'
-            archiveArtifacts allowEmptyArchive: true, artifacts: 'logs/**, reports/**'
+            allure([
+                includeProperties: false,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'allure-results']]
+            ])
+            archiveArtifacts allowEmptyArchive: true, artifacts: 'logs/**, reports/**, allure-results/**'
             bat 'docker compose down --remove-orphans'
         }
     }

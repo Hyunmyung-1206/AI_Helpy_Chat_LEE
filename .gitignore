@@ -4,6 +4,8 @@ __pycache__/
 .pytest_cache/
 logs/
 reports/
+allure-results/
+allure-report/
 .DS_Store
 venv/
 
