@@ -14,6 +14,7 @@ pipeline {
         JIRA_PROJECT_KEY = 'QA'
         DEFAULT_API_TIMEOUT = '10'
         HEADLESS = 'true'
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
     }
 
     stages {
