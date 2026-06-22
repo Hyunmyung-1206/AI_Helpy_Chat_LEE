@@ -1,7 +1,7 @@
 # AI Helpy Chat QA Automation
 
 > AI Helpy Chat의 Quiz, PPT, Deep Investigation 생성 기능을 Selenium + pytest로 자동 검증하는 QA 자동화 프로젝트입니다.  
-> Docker Compose 기반 Selenium 실행 환경과 Jenkins CI를 구성하고, JUnit/Allure Report, Slack, Jira 연동으로 테스트 결과 추적까지 자동화했습니다.
+> Docker Compose 기반 Selenium 실행 환경과 Jenkins CI를 구성하고, Allure Report, Slack, Jira 연동으로 테스트 결과 추적까지 자동화했습니다.
 
 ![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-9.x-0A9EDC?logo=pytest&logoColor=white)
