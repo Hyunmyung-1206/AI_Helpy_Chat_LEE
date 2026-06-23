@@ -38,11 +38,11 @@
 
 ### Jenkins Pipeline
 
-![Jenkins Pipeline](assets/readme/jenkins-pipeline.png)
+<img src="assets/readme/jenkins-pipeline.png" alt="Jenkins Pipeline" width="900">
 
 ### Docker Compose Test Run
 
-![Docker Compose Test Run](assets/readme/docker-compose-run.gif)
+<img src="assets/readme/docker-compose-run.gif" alt="Docker Compose Test Run" width="900">
 
 ---
 
@@ -102,6 +102,8 @@ pytest tests/test_quiz_create.py tests/test_ppt_create.py tests/test_deep_create
 프로젝트를 진행하면서 Codex AI를 적극적으로 활용해 기존 코드 흐름을 파악하고, 테스트 파일 분리, 공통 base 모듈 정리, Docker/Jenkins 기반 실행 환경 구성 방향을 잡았습니다. Codex를 단순 코드 작성 도구로만 사용하지 않고, 테스트 구조를 점검하고 반복되는 작업을 줄이는 협업 도구로 활용한 점이 이번 프로젝트의 중요한 경험이었습니다.
 
 특히 경계값 테스트를 수동으로 진행하면서 글자 수 확인과 입력값 생성에 시간이 많이 소요되는 문제가 있었습니다. 이를 개선하기 위해 별도의 경계값 검증 도구를 제작했고, 주제/지시사항 입력값 검증 시 반복 작업을 줄여 테스트 수행 효율을 높였습니다.
+
+<img src="assets/readme/boundary-value-tool.png" alt="QA Boundary Value Tool" width="900">
 
 - 실행 링크: [QA Boundary Value Tool](https://hyunmyung-1206.github.io/qa-boundary-value-tool/)
 - 상세 저장소: [Hyunmyung-1206/qa-boundary-value-tool](https://github.com/Hyunmyung-1206/qa-boundary-value-tool.git)
