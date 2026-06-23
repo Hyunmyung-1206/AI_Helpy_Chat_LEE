@@ -1,6 +1,6 @@
 # AI Helpy Chat QA Automation
 
-> AI Helpy Chat의 Quiz, PPT, 심층분석 생성 기능에 대해 TC/시나리오 설계, 결함 추적, 자동화 테스트 구축을 담당. 
+> AI Helpy Chat의 Quiz, PPT, 심층분석 생성 기능에 대해 TC/시나리오 설계, 결함 추적, 자동화 테스트 구축을 담당했습니다. 
 > Jenkins와 Docker를 활용한 자동화 CI/CD 파이프라인을 구성하고, Allure Report로 테스트 결과를 시각화했습니다.
 
 ![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python&logoColor=white)
