@@ -2,6 +2,8 @@
 
 > AI Helpy Chat은 5인 팀 프로젝트이며, 본 문서는 제가 담당한 QA 자동화와 테스트 산출물을 중심으로 정리했습니다.  
 > Jenkins와 Docker를 활용한 자동화 CI/CD 파이프라인을 구성하고, Allure Report로 테스트 결과를 시각화했습니다.
+> 프로젝트 **원본 저장소**는 👉 [**AI_Helpy_Chat**](https://github.com/Hyunmyung-1206/AI_Helpy_chat.git) 을 참고해 주세요.
+
 
 ![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-9.x-0A9EDC?logo=pytest&logoColor=white)
